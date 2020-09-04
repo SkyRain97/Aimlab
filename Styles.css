@@ -1,0 +1,8 @@
+ .button-target{
+ -fx-background-color: #AB4642;
+ -fx-background-radius: 50em;
+ -fx-min-width: 30px;
+ -fx-min-height: 30px;
+ -fx-max-width: 30px;
+ -fx-max-height: 30px;
+}
