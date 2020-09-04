@@ -11,10 +11,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import java.util.Random;
@@ -23,40 +21,54 @@ import java.util.concurrent.TimeUnit;
 public class Game  {
 
     private static Stage window;
-    private static Group group;
+    private static Pane pane;
     private static Scene scene;
-    private static double sceneLength = 1280;
-    private static double sceneHeight = 960;
-    private static int score = 0;
+    private static double sceneLength = 1440;
+    private static double sceneHeight = 1000;
+    private int score;
 
+
+    public int getScore() {
+        return score;
+    }
 
     public void setScore(int score) {
-        Game.score = score;
+        this.score = score;
     }
 
     //randomly display 20 buttons as targets to be clicked
     public void displayGame(){
         window = new Stage();
-        group = new Group();
-        window.setFullScreen(true);
-        VBox quitButtons = new VBox();
+        pane = new Pane();
+        BorderPane boarderPane = new BorderPane();
+        //window.setFullScreen(true);
+
+        VBox ButtonsLayout = new VBox();
         //for(int i = 0; i < 20; i++){
             Button target = new Button();
+
             Button quit = new Button("Quit");
             Button restart = new Button("Restart");
+
             double x = getRandomDouble() * (sceneLength);
             double y = getRandomDouble() * (sceneHeight);
-            System.out.println(x + " " + y);
-            target.setLayoutX(x);
-            target.setLayoutY(y);
 
+
+            target.relocate(x, y);
             target.setOnAction(e -> targetClicked(target));
-            group.getChildren().add(target);
-            scene = new Scene(group, sceneLength, sceneHeight);
+            target.getStyleClass().add("button-target");
 
+
+            pane.setPrefSize(2000, 1500);
+            pane.getChildren().add(target);
+            window.setMinHeight(sceneHeight);
+            window.setMinWidth(sceneLength);
+            scene = new Scene(pane);
+            scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
             window.setScene(scene);
-
             window.show();
+
+
         //}
     }
 
@@ -64,22 +76,26 @@ public class Game  {
     private void targetClicked(Button target){
         score++;
         Button newTarget = new Button();
+        newTarget.setShape(new Circle(40));
+        newTarget.getStyleClass().add("button-target");
         double v = getRandomDouble() * (sceneLength);
         double h = getRandomDouble() * (sceneHeight);
 
         System.out.println(v + " "+ h);
-        newTarget.setLayoutX(v);
-        newTarget.setLayoutY(h);
-        group.getChildren().remove(target);
+        newTarget.relocate(v, h);
+        pane.getChildren().remove(target);
 
         newTarget.setOnAction(e->targetClicked(newTarget));
         System.out.println(score);
 
         if(score == 5) {
+            System.out.println("game ended");
             window.setFullScreen(false);
-            boolean ans = Finished.displayFinishWindow("Congradulations! You finished in time!");
+            Finished newFinished = new Finished();
+            boolean ans = newFinished.displayFinishWindow("Congratulations! You finished in time!");
             if(ans == false) {
                 window.close();
+                score = 0;
 
             }else{
                 window.close();
@@ -88,7 +104,7 @@ public class Game  {
             return;
         }
 
-        group.getChildren().add(newTarget);
+        pane.getChildren().add(newTarget);
     }
 
     private static double getRandomDouble(){
@@ -101,5 +117,6 @@ public class Game  {
         }
         return result;
     }
+
 
 }
